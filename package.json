@@ -1,0 +1,60 @@
+/* ================= PERSONALIZACIÓN PLUS (esquinas, transparencias, modo noche extra) ================= */
+(function envolverConfigPersonalizacionPlus(){
+  let intentos = 0;
+  const t = setInterval(()=>{
+    intentos++;
+    if(typeof window.renderConfigPersonalizacion==='function'){
+      clearInterval(t);
+      const original = window.renderConfigPersonalizacion;
+      window.renderConfigPersonalizacion = function(body){
+        original(body);
+        body.insertAdjacentHTML('beforeend', bloqueFormaYTransparencia());
+      };
+    } else if(intentos>120){ clearInterval(t); }
+  }, 800);
+})();
+
+function bloqueFormaYTransparencia(){
+  const p = PERSONALIZACION || {};
+  return `
+    <div class="card">
+      <h3>◻️ Forma y transparencia</h3>
+      <div class="config-item"><div class="config-item-info"><div class="config-item-icon lila">◻️</div><div><label>Esquinas cuadradas</label><div class="sub">En vez de las esquinas redondeadas por defecto</div></div></div><button class="config-toggle ${p.esquinasCuadradas?'on':''}" onclick="toggleEsquinas(this)"></button></div>
+      <div class="config-item"><div class="config-item-info"><div class="config-item-icon blue">🫧</div><div><label>Tarjetas translúcidas</label><div class="sub">Efecto de vidrio esmerilado</div></div></div><button class="config-toggle ${p.transparencias?'on':''}" onclick="toggleTransparencias(this)"></button></div>
+    </div>
+    <div class="card">
+      <h3>🌙 Modo noche</h3>
+      <div class="config-item"><div class="config-item-info"><div class="config-item-icon gold">🖼️</div><div><label>Oscurecer imágenes</label><div class="sub">Reduce el brillo de fotos en modo oscuro</div></div></div><button class="config-toggle ${p.oscurecerImagenes?'on':''}" onclick="toggleOscurecerImagenes(this)"></button></div>
+      <p class="small muted">"Reducir animaciones" está en Ajustes → Accesibilidad, y "Sonidos suaves" en Ajustes → Sonidos → Sonido relajante de fondo.</p>
+    </div>`;
+}
+async function toggleEsquinas(btn){
+  const nuevo = !PERSONALIZACION.esquinasCuadradas;
+  btn.classList.toggle('on', nuevo);
+  await guardarPersonalizacion({esquinasCuadradas: nuevo});
+  document.documentElement.toggleAttribute('data-esquinas-cuadradas', nuevo);
+}
+async function toggleTransparencias(btn){
+  const nuevo = !PERSONALIZACION.transparencias;
+  btn.classList.toggle('on', nuevo);
+  await guardarPersonalizacion({transparencias: nuevo});
+  document.documentElement.toggleAttribute('data-transparencias', nuevo);
+}
+async function toggleOscurecerImagenes(btn){
+  const nuevo = !PERSONALIZACION.oscurecerImagenes;
+  btn.classList.toggle('on', nuevo);
+  await guardarPersonalizacion({oscurecerImagenes: nuevo});
+  document.documentElement.toggleAttribute('data-oscurecer-imagenes', nuevo);
+}
+(function aplicarFormaInicial(){
+  let intentos = 0;
+  const t = setInterval(()=>{
+    intentos++;
+    if(typeof PERSONALIZACION!=='undefined' && PERSONALIZACION && SESSION && SESSION.coupleId){
+      clearInterval(t);
+      document.documentElement.toggleAttribute('data-esquinas-cuadradas', !!PERSONALIZACION.esquinasCuadradas);
+      document.documentElement.toggleAttribute('data-transparencias', !!PERSONALIZACION.transparencias);
+      document.documentElement.toggleAttribute('data-oscurecer-imagenes', !!PERSONALIZACION.oscurecerImagenes);
+    } else if(intentos>150){ clearInterval(t); }
+  }, 1000);
+})();

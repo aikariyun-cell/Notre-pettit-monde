@@ -1,0 +1,90 @@
+/* ================= Menú hamburguesa (móvil) =================
+   Agrupa las mismas pestañas de siempre (TABS) en las categorías
+   reorganizadas. No elimina ni modifica ninguna pestaña: cada opción
+   sigue llamando a switchTab(id) tal cual funcionaba antes. En
+   escritorio la misma agrupación se usa en la barra inferior (con un
+   popover de subcategorías); este panel de pantalla completa sólo se
+   usa en móvil (ver @media en styles.css). */
+
+/* CATEGORIAS_NAV: fuente única para agrupar la navegación tanto en la
+   barra de escritorio (con popover de subcategorías) como en el menú
+   hamburguesa de móvil. Ningún id de pestaña real cambia, sólo cómo se
+   agrupan visualmente. */
+const CATEGORIAS_NAV = [
+  {id:'inicio', ic:'🏡', label:'Inicio', tab:'inicio'},
+  {id:'conoceme', ic:'💭', label:'Conóceme', tab:'conoceme'},
+  {id:'nosotros', ic:'💞', label:'Nosotros', subs:[
+    {ic:'💞', label:'Resumen', tab:'nosotros'},
+    {ic:'🌌', label:'Universo', tab:'universo'},
+    {ic:'💕', label:'Muro de momentos', tab:'muro'},
+    {ic:'💗', label:'Nuestro perfil', accion:'verPerfilPareja()'},
+  ]},
+  {id:'conexion', ic:'🌸', label:'Conexión', tab:'conexion'},
+  {id:'cartas', ic:'💌', label:'Cartas', subs:[
+    {ic:'💌', label:'Cartas', tab:'cartas'},
+    {ic:'🎨', label:'Postales', tab:'postalavanzada'},
+  ]},
+  {id:'crear', ic:'🎨', label:'Crear', tab:'crear'},
+  {id:'album', ic:'🖼️', label:'Álbum', subs:[
+    {ic:'🖼️', label:'Fotos', tab:'album'},
+    {ic:'🎥', label:'Multimedia', tab:'multimedia'},
+    {ic:'🎞️', label:'Película', tab:'pelicula'},
+    {ic:'📖', label:'Biblioteca', tab:'biblioteca'},
+  ]},
+  {id:'calendario', ic:'📅', label:'Calendario', tab:'calendario'},
+  {id:'chat', ic:'💬', label:'Chat', tab:'chat'},
+  {id:'musica', ic:'🎵', label:'Música', tab:'musica'},
+  {id:'entretenimiento', ic:'🎬', label:'Entretenimiento', tab:'entretenimiento'},
+  {id:'regalos', ic:'🎁', label:'Regalos', tab:'regalos'},
+  {id:'juegos', ic:'🎲', label:'Juegos', tab:'juegos'},
+  {id:'compatibilidad', ic:'🧩', label:'Compatibilidad', tab:'compatibilidad'},
+  {id:'elecciones', ic:'🎯', label:'Elecciones', tab:'parejaplus'},
+  {id:'colecciones', ic:'💕', label:'Colecciones', subs:[
+    {ic:'🍳', label:'Recetas', tab:'recetario'},
+    {ic:'💕', label:'Ver colecciones', tab:'coleccion'},
+  ]},
+  {id:'recuerdos', ic:'📖', label:'Recuerdos', tab:'recuerdos'},
+  {id:'organizacion', ic:'🗂️', label:'Organización', subs:[
+    {ic:'🗂️', label:'Organización', tab:'organizacion'},
+    {ic:'🍿', label:'Planes', tab:'planificador'},
+  ]},
+  {id:'emojis', ic:'😊', label:'Emojis', tab:'emojis'},
+  {id:'emociones', ic:'🎭', label:'Emociones', tab:'emociones'},
+  {id:'avatar', ic:'👤', label:'Avatar', tab:'avatar'},
+  {id:'extras', ic:'✨', label:'Extras', subs:[
+    {ic:'✨', label:'Extras', tab:'extras'},
+    {ic:'📝', label:'Notas', tab:'notas'},
+    {ic:'📈', label:'Línea del tiempo', tab:'lineatiempo'},
+  ]},
+  {id:'config', ic:'⚙️', label:'Ajustes', tab:'config'},
+];
+
+function toggleMenuMovil(forzar){
+  const overlay = document.getElementById('menuMovilOverlay');
+  if(!overlay) return;
+  const abrir = typeof forzar === 'boolean' ? forzar : !overlay.classList.contains('abierto');
+  overlay.classList.toggle('abierto', abrir);
+  if(abrir) renderMenuMovil();
+}
+
+function renderMenuMovil(){
+  const panel = document.getElementById('menuMovilPanel');
+  if(!panel) return;
+  panel.innerHTML = CATEGORIAS_NAV.map(cat=>{
+    if(!cat.subs){
+      return `<div class="menu-movil-cat"><button class="menu-movil-cat-btn ${activeTab===cat.tab?'activa':''}" onclick="irACategoriaMovil('${cat.tab}')"><span class="ic">${cat.ic}</span>${esc(cat.label)}</button></div>`;
+    }
+    const abierta = cat.subs.some(s=>s.tab===activeTab);
+    return `<div class="menu-movil-cat ${abierta?'abierta':''}">
+      <button class="menu-movil-cat-btn" onclick="this.parentElement.classList.toggle('abierta')"><span class="ic">${cat.ic}</span>${esc(cat.label)}<span class="chev">▾</span></button>
+      <div class="menu-movil-subs">
+        ${cat.subs.map(s=>`<button class="${s.tab && s.tab===activeTab?'activa':''}" onclick="${s.accion?s.accion+';toggleMenuMovil(false)':`irACategoriaMovil('${s.tab}')`}"><span>${s.ic||''}</span>${esc(s.label)}</button>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function irACategoriaMovil(tabId){
+  toggleMenuMovil(false);
+  switchTab(tabId);
+}

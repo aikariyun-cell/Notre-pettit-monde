@@ -1,0 +1,121 @@
+import { Html, Head, Main, NextScript } from 'next/document';
+import Script from 'next/script';
+import {
+  FAVICON_ICON,
+  SHORTCUT_ICON,
+  APPLE_TOUCH_ICON,
+  MANIFEST_DATA_URI,
+} from '../lib/icons';
+
+// Scripts propios de la app, EN EL MISMO ORDEN EXACTO que en el index.html
+// original (justo después de js/core.js). No se elimina ni reordena ningún
+// archivo para no alterar el comportamiento de la app.
+const APP_SCRIPTS = [
+  'tabs-recuerdos',
+  'tabs-comunicacion',
+  'tabs-social',
+  'tabs-personalizacion',
+  'organizacion',
+  'coleccion',
+  'multimedia',
+  'personalizacion-visual',
+  'sonidos',
+  'estado',
+  'notas-rapidas',
+  'libro',
+  'calidad-vida',
+  'inicio-plus',
+  'emociones',
+  'biblioteca',
+  'muro-momentos',
+  'universo',
+  'pareja-plus',
+  'ambiente',
+  'camara',
+  'planificador',
+  'recetario',
+  'scrapbook-paginas',
+  'linea-tiempo',
+  'pelicula',
+  'postal-avanzada',
+  'privacidad',
+  'personalizacion-plus',
+  'nosotros-pinceles',
+  'tabs-register',
+  'navegacion-categorias',
+  'menu-movil',
+  'mapa-recuerdos',
+  'nuestra-distancia',
+  'llamadas',
+];
+
+// Este documento reproduce EXACTAMENTE el <head> del index.html original:
+// mismos metadatos, mismos iconos (embebidos como data URI), misma
+// fuente de Google Fonts y la misma hoja de estilos css/styles.css.
+export default function Document() {
+  return (
+    <Html lang="es">
+      <Head>
+        <meta charSet="UTF-8" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1"
+        />
+        <title>Notre petit monde</title>
+
+        <link rel="icon" type="image/png" href={FAVICON_ICON} />
+        <link rel="shortcut icon" type="image/png" href={SHORTCUT_ICON} />
+        <link rel="apple-touch-icon" href={APPLE_TOUCH_ICON} />
+        <link rel="manifest" href={MANIFEST_DATA_URI} />
+
+        <meta name="theme-color" content="#eeb1cd" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Notre petit monde" />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Quicksand:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+
+        {/* Hoja de estilos original, servida tal cual desde /public/css */}
+        <link rel="stylesheet" href="/css/styles.css" />
+      </Head>
+      <body>
+        <Main />
+
+        {/* ======= Scripts EXACTOS del index.html original, en el mismo orden.
+            Se usan como "beforeInteractive" (sólo válido en _document.js) para
+            que se ejecuten en orden, de forma síncrona, igual que los <script>
+            clásicos al final del body en el HTML original. Para cuando se
+            ejecutan, todo el markup de arriba (renderizado por <Main/>) ya
+            existe en el DOM. */}
+        <Script
+          src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"
+          strategy="beforeInteractive"
+        />
+        <Script
+          src="https://cdn.jsdelivr.net/npm/livekit-client@2/dist/livekit-client.umd.min.js"
+          strategy="beforeInteractive"
+        />
+        <Script
+          src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"
+          strategy="beforeInteractive"
+        />
+        <Script
+          src="https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js"
+          strategy="beforeInteractive"
+        />
+        <Script src="/js/firebase-config-inline.js" strategy="beforeInteractive" />
+
+        <Script src="/js/core.js" strategy="beforeInteractive" />
+        {APP_SCRIPTS.map((name) => (
+          <Script key={name} src={`/js/${name}.js`} strategy="beforeInteractive" />
+        ))}
+
+        <NextScript />
+      </body>
+    </Html>
+  );
+}
